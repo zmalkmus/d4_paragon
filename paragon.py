@@ -246,12 +246,17 @@ class ParagonBoard:
 
         for m in self.meta_boards:
             stitched = []
-            for m_row in m:
+            for i, m_row in enumerate(m):
                 for b_row in range(self.board_edge_len):
                     current_row = ["".join(m_col.board[b_row]) for m_col in m_row]
                     stitch_row = " | ".join(current_row)
                     stitched.append(stitch_row)
-                stitched.append('=' * (self.board_edge_len * len(m) + (3 * (len(m)-1))) )
+
+                # Only add connecting lines if it's not the last row
+                if i < len(m) - 1:
+                    stitched.append((" " * self.board_edge_len + " | ") * (len(m) - 1) + " " * self.board_edge_len)
+                    stitched.append(("=" * self.board_edge_len + "=|=") * (len(m) - 1) + "=" * self.board_edge_len)
+                    stitched.append((" " * self.board_edge_len + " | ") * (len(m) - 1) + " " * self.board_edge_len)
 
             self.stitched_patterns.append(stitched)
 
@@ -290,7 +295,7 @@ class ParagonBoard:
                 for stitch in self.stitched_patterns:
                     for row in stitch:
                         file.write(' '.join(row) + '\n')
-                    file.write('\n\n\n')
+                    file.write('\n\n\n\n')
 
         except IOError as e:
             logging.error(f"Failed to write paragon board '{self.name}' to '{filename}': {e}")
